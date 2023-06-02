@@ -1,0 +1,37 @@
+from collections import defaultdict
+
+class Solution:
+    def maximumDetonation(self, bombs: List[List[int]]) -> int:
+        dictionary = defaultdict(lambda: [])
+        length = len(bombs)
+
+        for i, bomb in enumerate(bombs):
+            for j, point in enumerate(bombs):
+                if i!=j and self.isPointInsideCircle(bomb, point):
+                    dictionary[i].append(j)
+
+        result = 1
+        for i in range(length):
+            count = self.numberOfDetonation(dictionary, i)
+            if result < count:
+                result = count
+
+        return result
+
+    def numberOfDetonation(self, dictionary, index: int) -> int:
+        count = 1 + len(dictionary[index])
+
+        index_set = {index}
+        stack = [index]
+
+        while stack:
+            ind = stack.pop()
+            for i in dictionary[ind]:
+                if i not in index_set:
+                    index_set.add(i)
+                    stack.append(i)
+
+        return len(index_set)
+
+    def isPointInsideCircle(self, center: List[int], point: List[int]) -> bool:
+        return pow(point[0]-center[0],2) + pow(point[1]-center[1],2) <= pow(center[2],2)
